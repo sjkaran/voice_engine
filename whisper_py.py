@@ -1,21 +1,30 @@
-import whisper
 import sounddevice as sd
 import numpy as np
 from scipy.io.wavfile import write
+import whisper
+import pyttsx3
 
+#setting up the TTS
+engine = pyttsx3.init()
+voice = engine.getProperty("voices")
+engine.setProperty("voice",voice[0].id)
+engine.setProperty('rate',150)
+engine.setProperty('volume',1.0)
+
+#the listening part
 fs = 16000
-duration = 10 # max duration
-threshold = 0.01 # silence threshold
+duration = 10  # max duration
+threshold = 0.01  # silence threshold
 
 print("Speak...")
 
-recording = sd.rec(int(duration * fs),samplerate = fs, channels=1)
+recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
 sd.wait()
 
 # Trim silence
 audio = recording.flatten()
 
-#find where sound starts/stops
+# Find where sound starts/stops
 indices = np.where(np.abs(audio) > threshold)[0]
 
 if len(indices) > 0:
@@ -28,8 +37,36 @@ else:
 # Convert to int16
 trimmed_audio = (trimmed_audio * 32767).astype(np.int16)
 
-write("output.wav",fs,trimmed_audio)
+write("output.wav", fs, trimmed_audio)
 
-model = whisper.load_model("base")  # try tiny/base/small
-result = model.transcribe("output.wav")
-print("You said:", result["text"])
+
+
+#the recognizing part
+model = whisper.load_model("base")
+
+try:
+    #the telling part
+    result = model.transcribe("output.wav")
+    print("You said: ",result["text"])
+    text = result["text"]
+
+    #TTS response
+    if "fuck" in text:
+        print("Fuck you man stop cursing.")
+        engine.say("Fuck you man stop cursing")
+        engine.runAndWait()
+    elif "you are great" in text:
+        print("I know that, You are great too.")
+        engine.say(f"I know that, You are great too.")
+        engine.runAndWait()
+    else:
+        engine.say(f"{text}. thats all I heared.")
+        engine.runAndWait()
+
+except Exception as e:
+    print("Error", e)
+    engine.say("I did not get you bro.")
+    engine.runAndWait()
+
+
+    
