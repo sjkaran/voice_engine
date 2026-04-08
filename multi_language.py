@@ -1,21 +1,19 @@
-from transformers import pipeline
-import sounddevice as sd
-import numpy as np
-
-# Load a community fine-tuned Odia Whisper model
+import torch
 from transformers import pipeline
 
-pipe = pipeline("automatic-speech-recognition", model="Ranjit/odia_whisper_small_v3.0")
+audio = "output.wav"
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
+modelTags = "ARTPARK-IISc/whisper-large-v3-vaani-odia"
 
-def record_and_transcribe(duration=5, sample_rate=16000):
-    print("🎤 Recording...")
-    audio = sd.rec(int(duration * sample_rate),
-                   samplerate=sample_rate, channels=1, dtype='float32')
-    sd.wait()
-    audio = audio.flatten()
+transcribe = pipeline(
+    task="automatic-speech-recognition",
+    model=modelTags,
+    chunk_length_s=30,
+    device=device
+)
 
-    result = pipe({"raw": audio, "sampling_rate": sample_rate})
-    print(f"📝 Odia: {result['text']}")
-    return result["text"]
 
-record_and_transcribe()
+transcribe.model.config.forced_decoder_ids = None
+transcribe.model.generation_config.forced_decoder_ids = None
+
+print("Transcription:", transcribe(audio)["text"])
