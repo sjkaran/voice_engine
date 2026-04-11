@@ -2,17 +2,8 @@ import sounddevice as sd
 import numpy as np
 from scipy.io.wavfile import write
 import whisper
-import pyttsx3
 import win32com.client
 import pythoncom 
-
-
-#setting up the TTS and whisper
-engine = pyttsx3.init()
-voice = engine.getProperty("voices")
-engine.setProperty("voice",voice[0].id)
-engine.setProperty('rate',150)
-engine.setProperty('volume',1.0)
 
 
 

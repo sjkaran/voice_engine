@@ -68,11 +68,13 @@ def process_commands(text): #step 2
     elif any(word in text for word in ["time","clock","current time"]):
         import datetime
         now = datetime.datetime.now().strftime("%H:%M")
+        datenow = datetime.datetime.now().strftime("%DD%MM%YYYY")
+        print(datenow)
         return f"The time is {now}","time"
     elif any(word in text for word in ["hello", "hi","hey","whatsup"]):
         return "Hello Karan","greeting"
     elif any(word in text for word in ["close","quit","exit"]):
-        return "Closing", "exit"
+        return "Closing at once, Sir...", "exit"
     else:
         return "I did not get you sir.", "unknown"
 
