@@ -6,6 +6,8 @@ import pyttsx3
 import win32com.client
 import pythoncom 
 
+# complete version 0.1
+
 
 #setting up the TTS and whisper
 engine = pyttsx3.init()

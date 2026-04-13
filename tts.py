@@ -4,6 +4,8 @@ import numpy as np
 from scipy.io.wavfile import write
 import pyttsx3
 
+# normal text to speech
+
 engine = pyttsx3.init()
 voice = engine.getProperty('voices')
 

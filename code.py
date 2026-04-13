@@ -4,6 +4,10 @@ import numpy as np
 from scipy.io.wavfile import write
 import pyttsx3
 
+
+# voice listening and replying without using whisper
+# requires internet connection and less accurate.
+
 # TTS setup
 engine = pyttsx3.init()
 

@@ -5,7 +5,7 @@ import whisper
 import win32com.client
 import pythoncom 
 
-
+# complete version 0.2
 
 #the listening part
 def listening_recognize():
