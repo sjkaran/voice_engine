@@ -1,1 +1,6 @@
 
+model/
+*.zip
+*.wav
+__pycache__/
+venv/

@@ -41,21 +41,30 @@ def process_command(text): #step 2
     else:
         return "I did not get you sir.", "unknown"
 
-while True:
-    print("Listening for wake word...")
+buffer = np.array([], dtype=np.float32)
 
-    # short recording
+while True:
     recording = sd.rec(int(2 * fs), samplerate=fs, channels=1)
     sd.wait()
 
-    audio = recording.flatten()
-    audio = audio.astype(np.float32)
+    chunk = recording.flatten().astype(np.float32)
 
-    result = model.transcribe(audio)
+    # 🔥 accumulate audio
+    buffer = np.concatenate((buffer, chunk))
+
+    # keep only last ~4 seconds
+    if len(buffer) > fs * 4:
+        buffer = buffer[-fs*4:]
+
+    result = model.transcribe(buffer)
     text = result["text"].lower().strip()
 
     print("Heard:", text)
 
+    if "assistant" in text:
+        print("Activated!")
+        break
+    
     if "servant" in text:
         print("Activated!")
 

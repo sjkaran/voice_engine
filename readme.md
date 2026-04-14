@@ -18,4 +18,4 @@ I am building a Tool that listens to natuaral language voices of the user, recog
 * Updated our pipeline, skipped the wav file reading and writing part to enhance speed and efficiency in communication.
 * added multi-lingual voice engine program, waiting to be tested and verified.
 * dt: $13th Apr 2026$: working on wake word system activation just like real time virtual assistants.
-
+* dt: $14th Apr 2026$: completed working on wake word activated system, completely working program, ready to implement.
