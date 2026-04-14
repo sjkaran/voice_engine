@@ -10,78 +10,100 @@ Loop:
     Else → ignore
 """
 
-import whisper
 import sounddevice as sd
 import numpy as np
+import queue
+import json
+import whisper
 import win32com.client
 import pythoncom
-from scipy.io.wavfile import write
+from vosk import Model, KaldiRecognizer
 
-pythoncom.CoUninitialize()
+# ---------------- SETUP ----------------
+pythoncom.CoInitialize()
 engine = win32com.client.Dispatch("SAPI.SpVoice")
 
-fs = 16000
-duration = 2
-threshold = 0.01
 model = whisper.load_model("base")
+model_path = "model/vosk-model-small-en-in-0.4"
 
-def process_command(text): #step 2
+vosk_model = Model(model_path)
+recognizer = KaldiRecognizer(vosk_model, 16000)
+
+q = queue.Queue()
+
+def callback(indata, frames, time, status):
+    q.put(bytes(indata))
+
+# ---------------- COMMAND SYSTEM ----------------
+def process_command(text):
     if "open youtube" in text:
-        return "Opening Youtube", "open_youtube"
-    elif "what is your name?" in text:
-        return "I am your servent sir.","identity"
-    elif any(word in text for word in ["time","clock","current time"]):
+        import webbrowser
+        webbrowser.open("https://youtube.com")
+        return "Opening YouTube", "open_youtube"
+
+    elif "time" in text:
         import datetime
         now = datetime.datetime.now().strftime("%H:%M")
-        return f"The time is {now}","time"
-    elif any(word in text for word in ["hello", "hi","hey","whatsup"]):
-        return "Hello Karan","greeting"
-    elif any(word in text for word in ["close","quit","exit"]):
-        return "Closing", "exit"
+        return f"The time is {now}", "time"
+
+    elif "hello" in text:
+        return "Hello Karan", "greeting"
+
+    elif "exit" in text or "quit" in text:
+        return "Goodbye", "exit"
+
     else:
-        return "I did not get you sir.", "unknown"
+        return "I did not understand that", "unknown"
 
-buffer = np.array([], dtype=np.float32)
-
-while True:
-    recording = sd.rec(int(2 * fs), samplerate=fs, channels=1)
+# ---------------- RECORD FUNCTION ----------------
+def record_command(duration=4, fs=16000):
+    recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
     sd.wait()
+    audio = recording.flatten().astype(np.float32)
+    return audio
 
-    chunk = recording.flatten().astype(np.float32)
+# ---------------- MAIN LOOP ----------------
+print("🎤 Assistant is running...")
 
-    # 🔥 accumulate audio
-    buffer = np.concatenate((buffer, chunk))
+stream = sd.RawInputStream(
+    samplerate=16000,
+    blocksize=8000,
+    dtype='int16',
+    channels=1,
+    callback=callback
+)
 
-    # keep only last ~4 seconds
-    if len(buffer) > fs * 4:
-        buffer = buffer[-fs*4:]
+with stream:
+    while True:
+        print("Listening for wake word...")
 
-    result = model.transcribe(buffer)
-    text = result["text"].lower().strip()
+        data = q.get()
 
-    print("Heard:", text)
+        if recognizer.AcceptWaveform(data):
+            result = json.loads(recognizer.Result())
+            text = result.get("text", "").lower()
 
-    if "assistant" in text:
-        print("Activated!")
-        break
-    
-    if "servant" in text:
-        print("Activated!")
+            print("Heard:", text)
 
-        engine.Speak("Yes?")
+            if "assistant" in text:
+                print("✅ Activated")
 
-        # now record full command
-        recording = sd.rec(int(4 * fs), samplerate=fs, channels=1)
-        sd.wait()
+                engine.Speak("Yes?")
 
-        audio = recording.flatten()
-        audio = audio.astype(np.float32)
+                # record command
+                audio = record_command()
 
-        result = model.transcribe(audio)
-        command = result["text"].lower().strip()
+                # whisper transcription
+                result = model.transcribe(audio)
+                command = result["text"].lower().strip()
 
-        print("Command:", command)
+                print("Command:", command)
 
-        response, action = process_command(command)
+                # process command
+                response, action = process_command(command)
 
-        engine.Speak(response)
+                print("Response:", response)
+                engine.Speak(response)
+
+                if action == "exit":
+                    break

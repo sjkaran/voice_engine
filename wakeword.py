@@ -12,7 +12,7 @@ vengine = win32com.client.Dispatch("SAPI.SpVoice")
 def callback(indata, frames, time, status):
     q.put(bytes(indata))
 
-model_path = "model/vosk-model-small-en-in-0.4"
+model_path = "model/vosk-model-small-en-in-0.4" #path to the vosk model.
 model = Model(model_path)
 recognizer = KaldiRecognizer(model, 16000)
 
