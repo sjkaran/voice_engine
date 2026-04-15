@@ -19,12 +19,12 @@ import win32com.client
 import pythoncom
 from vosk import Model, KaldiRecognizer
 
-# ---------------- SETUP ----------------
+# setup
 pythoncom.CoInitialize()
 engine = win32com.client.Dispatch("SAPI.SpVoice")
 
 model = whisper.load_model("base")
-model_path = "model/vosk-model-small-en-in-0.4"
+model_path = "model/en-us/vosk-model-small-en-us-0.15"
 
 vosk_model = Model(model_path)
 recognizer = KaldiRecognizer(vosk_model, 16000)
@@ -34,7 +34,7 @@ q = queue.Queue()
 def callback(indata, frames, time, status):
     q.put(bytes(indata))
 
-# ---------------- COMMAND SYSTEM ----------------
+# command system
 def process_command(text):
     if "open youtube" in text:
         import webbrowser
@@ -51,18 +51,20 @@ def process_command(text):
 
     elif "exit" in text or "quit" in text:
         return "Goodbye", "exit"
+    elif "what is your name?" in text:
+        return "I am Abhijit", "introduction"
 
     else:
         return "I did not understand that", "unknown"
 
-# ---------------- RECORD FUNCTION ----------------
+# record function
 def record_command(duration=4, fs=16000):
     recording = sd.rec(int(duration * fs), samplerate=fs, channels=1)
     sd.wait()
     audio = recording.flatten().astype(np.float32)
     return audio
 
-# ---------------- MAIN LOOP ----------------
+# main loop
 print("🎤 Assistant is running...")
 
 stream = sd.RawInputStream(
@@ -85,7 +87,7 @@ with stream:
 
             print("Heard:", text)
 
-            if "assistant" in text:
+            if "hello" in text:
                 print("✅ Activated")
 
                 engine.Speak("Yes?")
