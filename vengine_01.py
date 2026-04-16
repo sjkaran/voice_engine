@@ -23,7 +23,7 @@ from vosk import Model, KaldiRecognizer
 pythoncom.CoInitialize()
 engine = win32com.client.Dispatch("SAPI.SpVoice")
 
-model = whisper.load_model("base")
+model = whisper.load_model("tiny")
 model_path = "model/en-us/vosk-model-small-en-us-0.15"
 
 vosk_model = Model(model_path)
@@ -52,7 +52,7 @@ def process_command(text):
     elif "exit" in text or "quit" in text:
         return "Goodbye", "exit"
     elif "what is your name?" in text:
-        return "I am Abhijit", "introduction"
+        return "I am your servant sir.", "roduction"
 
     else:
         return "I did not understand that", "unknown"
@@ -87,7 +87,7 @@ with stream:
 
             print("Heard:", text)
 
-            if "hello" in text:
+            if "servant" in text:
                 print("✅ Activated")
 
                 engine.Speak("Yes?")
