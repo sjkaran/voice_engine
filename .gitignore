@@ -2,5 +2,6 @@
 model/
 *.zip
 *.wav
+*.db
 __pycache__/
 venv/
