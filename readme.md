@@ -1,5 +1,6 @@
 ## What am I building?
 I am building a Tool that listens to natuaral language voices of the user, recognizes and communicate accordingly.
+> the bench mark is not to do achieve the function but to make it more efficient than other existing models.
 
 ### what am I using for this?
 * this is totally build on python and its frameworks:
@@ -19,3 +20,5 @@ I am building a Tool that listens to natuaral language voices of the user, recog
 * added multi-lingual voice engine program, waiting to be tested and verified.
 * dt: $13th Apr 2026$: working on wake word system activation just like real time virtual assistants.
 * dt: $14th Apr 2026$: completed working on wake word activated system, completely working program, ready to implement (wakeword.py), implemented version (vengine_01.py)
+* successfully implemented multilingual speech recognition.
+
