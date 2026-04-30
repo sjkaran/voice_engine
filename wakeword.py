@@ -12,7 +12,7 @@ vengine = win32com.client.Dispatch("SAPI.SpVoice")
 def callback(indata, frames, time, status):
     q.put(bytes(indata))
 
-model_path = "model/vosk-model-small-en-in-0.4" #path to the vosk model.
+model_path = "model/en-in/vosk-model-small-en-in-0.4" #path to the vosk model.
 model = Model(model_path)
 recognizer = KaldiRecognizer(model, 16000)
 
@@ -39,3 +39,8 @@ with stream:
                 vengine.Speak("I am your Servant sir...")
                 break
 
+
+
+
+
+# the above code shows the mechanism of how wake word works (how the system detects wakewords and gets activated).
