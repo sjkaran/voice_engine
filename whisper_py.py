@@ -78,7 +78,7 @@ def process_commands(text): #step 2
     elif any(word in text for word in ["close","quit","exit"]):
         return "Closing at once, Sir...", "exit"
     else:
-        return "I did not get you sir.", "unknown"
+        return text
 
 
 while True: #step 3 execute actions

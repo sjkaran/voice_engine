@@ -49,6 +49,12 @@ def process_command(text):
     elif "hello" in text:
         return "Hello Karan", "greeting"
 
+    elif "name" in text:
+        return "My name is Chutiya", "name"
+
+    elif "who are you?" in text:
+        return "I am your servant master.","greeting"
+
     elif "exit" in text or "quit" in text:
         return "Goodbye", "exit"
     elif "what is your name?" in text:
